@@ -137,6 +137,7 @@ public class App extends PApplet {
 
     Enemies enemies = new Enemies(this);
     Towers towers = new Towers(this);
+    int index_of_last_selected_twr = 0;
 
     public PImage rotateWizTower(PImage orig, String direct) {
         if (direct.equals("N")) {
@@ -186,9 +187,10 @@ public class App extends PApplet {
 
     public void towerAdditions(Tower tower) {
         if (tower.selected) {
-            this.strokeWeight(4);
+            noFill();
+            this.strokeWeight(10);
             this.stroke(255, 255, 0);
-            this.circle(tower.x, tower.y, 20);
+            this.rect(tower.x, tower.y, 100, 100); //THIS NEEEEEEEEEEEEDSSS TO BEEEE FIXXXXEDD (ADDING CIRCLE WHEN selected)
         }
         if (tower.lvl==0) {
             towerAdditions_sub(tower, 0);
@@ -199,6 +201,7 @@ public class App extends PApplet {
         }
         this.strokeWeight(1);
         this.stroke(0);
+        fill(0);
     }
 
     private void circle(float f, float g, float h) {
@@ -596,6 +599,10 @@ public class App extends PApplet {
                 max_y = grass_tiles.get(tile)[1]+32;
                 if ((mouseX>min_x)&&(mouseX<max_x)&&(mouseY<max_y)&&(mouseY>min_y)) {
                     grass_tiles.remove(tile);
+                    Integer[] towerHere = new Integer[2];
+                    towerHere[0] = min_x;
+                    towerHere[1] = min_y;
+                    tower_tiles.add(towerHere);
                     if (!upgrade_damage&&!upgrade_range&&!upgrade_speed) {
                         Current_mana -= tower_cost;
                     }
@@ -619,9 +626,26 @@ public class App extends PApplet {
                     if (upgrade_speed) {
                         tower.upgrade_speed();
                     }
+                    index_of_last_selected_twr = towers.allTowers.size();
                     towers.AddTower(tower);
                     break;              
                 };
+            }
+        } else {
+            for (int twr_tile=0;twr_tile<tower_tiles.size();twr_tile++) {
+                min_x = tower_tiles.get(twr_tile)[0];
+                max_x = tower_tiles.get(twr_tile)[0]+32;
+                min_y = tower_tiles.get(twr_tile)[1];
+                max_y = tower_tiles.get(twr_tile)[1]+32;
+                if ((mouseX>min_x)&&(mouseX<max_x)&&(mouseY<max_y)&&(mouseY>min_y)) {
+                    for (int twr=0; twr<towers.allTowers.size();twr++) { 
+                        if (towers.allTowers.get(twr).x==min_x&&towers.allTowers.get(twr).y==min_y) {
+                            towers.allTowers.get(twr).selected = true;
+                        } else {
+                             towers.allTowers.get(twr).selected = false;
+                        }
+                    }
+                }
             }
         }
     }
