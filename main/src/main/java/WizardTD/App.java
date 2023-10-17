@@ -128,6 +128,7 @@ public class App extends PApplet {
     PImage tower_0;
     PImage tower_1;
     PImage tower_2;
+    PImage fireball;
 
 	int villain_test_count = 0;
     Baddie villain;
@@ -155,6 +156,21 @@ public class App extends PApplet {
     }
     public void youreAWinner() {
 
+    }
+
+    public void firingAtMonsters() {
+        for (int tower = 0; tower<towers.allTowers.size(); tower++) {
+            Tower Current_tower = towers.allTowers.get(tower);
+            for (int enemy = 0; enemy<enemies.allBaddies.size();enemy++) {
+                Baddie Current_enemy = enemies.allBaddies.get(enemy);
+                double a = Math.abs((Current_enemy.x+16)-(Current_tower.x+16));
+                double b = Math.abs((Current_enemy.y+16)-(Current_tower.y+16));
+                double c = Math.sqrt(a*a+b*b);
+                if (c<Current_tower.range) {
+                    System.out.println("Something");
+                }
+            }
+        }
     }
 
     public String repeater(String str, int times) {
@@ -185,12 +201,19 @@ public class App extends PApplet {
     }
 
 
-    public void towerAdditions(Tower tower) {
+    public void towerAdditions(Tower tower, int tow) {
         if (tower.selected) {
+            /*for (int t = 0; t<towers.allTowers.size(); t++) {
+                if (t == tow) {
+                    continue;
+                } else {
+                    towers.allTowers.get(t).selected = false;
+                }
+            }*/
             noFill();
-            this.strokeWeight(10);
+            this.strokeWeight(3);
             this.stroke(255, 255, 0);
-            this.rect(tower.x, tower.y, 100, 100); //THIS NEEEEEEEEEEEEDSSS TO BEEEE FIXXXXEDD (ADDING CIRCLE WHEN selected)
+            this.arc(tower.x*1f+16, tower.y*1f+16, tower.range*2f, tower.range*2f, 0, TWO_PI); //THIS NEEEEEEEEEEEEDSSS TO BEEEE FIXXXXEDD (ADDING CIRCLE WHEN selected)
         }
         if (tower.lvl==0) {
             towerAdditions_sub(tower, 0);
@@ -204,8 +227,6 @@ public class App extends PApplet {
         fill(0);
     }
 
-    private void circle(float f, float g, float h) {
-    }
     public void drawTowers() {
         if (towers.allTowers.size()>0) {
             for (int tow = 0; tow<towers.allTowers.size(); tow++) {
@@ -220,7 +241,7 @@ public class App extends PApplet {
                     tower.draw(this, tower_0);
                     tower.setLevel(0);
                 }
-                towerAdditions(tower);
+                towerAdditions(tower, tow); 
             }
         }
     }
@@ -511,6 +532,7 @@ public class App extends PApplet {
         tower_0 = loadImage("src/main/resources/WizardTD/tower0.png");
         tower_1 = loadImage("src/main/resources/WizardTD/tower1.png");
         tower_2 = loadImage("src/main/resources/WizardTD/tower2.png");
+        fireball = loadImage("src/main/resources/WizardTD/fireball.png");
 
 
         //loading config.json
@@ -669,6 +691,7 @@ public class App extends PApplet {
         textSize(CELLSIZE);
         printmap();
         image(doorMat, x_d_wiz, y_d_wiz);
+        drawTowers();
         if (twotimes) {
             frameRate(FPS*2);
         } else {
@@ -676,6 +699,7 @@ public class App extends PApplet {
         }
         // wave label
         this.fill(0);
+        this.textSize(CELLSIZE);
         this.text("wave: "+Wave_num,10, 35);
         this.fill(0);
         this.textSize(19);
@@ -748,8 +772,8 @@ public class App extends PApplet {
             youreAWinner();
         }
 
-        drawTowers();
-
+        //drawTowers();
+        firingAtMonsters();
         image(Wiz_house, x_wiz, y_wiz);
     }
 

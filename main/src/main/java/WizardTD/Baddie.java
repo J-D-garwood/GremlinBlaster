@@ -6,8 +6,8 @@ import java.util.Random;
 import processing.core.PImage;
 
 public class Baddie {
-    private int x;
-    private int y;
+    public int x;
+    public int y;
 
     public int health;
     public int Speed;
