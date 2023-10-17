@@ -42,14 +42,20 @@ public class Tower {
     }
 
     // may need to change "void" to "int" in below method...
-    public void draw(App app,  PImage towerSprite) {
+    public Fireball draw(App app,  PImage towerSprite) {
         app.image(towerSprite, x, y);
         this.frame_count += 1;
         if (this.fireballs.allFireballs.size()>0) {
             for (int fireb=0; fireb<this.fireballs.allFireballs.size(); fireb++) {
                 this.fireballs.allFireballs.get(fireb).draw(app);
+                if (this.fireballs.allFireballs.get(fireb).destination_reached) {
+                    this.FB = this.fireballs.allFireballs.get(fireb);
+                    this.fireballs.allFireballs.remove(fireb);
+                    return this.FB;
+                }
             }
         }
+        return null;
     }
 
 

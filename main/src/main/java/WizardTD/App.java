@@ -169,9 +169,11 @@ public class App extends PApplet {
                 double b = (Current_enemy.y+16)-(Current_tower.y+16);
                 double c = Math.sqrt(a*a+b*b);
                 if (c<Current_tower.range) {
-                    double end_x = Current_enemy.x+16;
-                    double end_y = Current_enemy.y+16;
-                    Current_tower.add_FIRE(this, fireball, end_x, end_y);
+                    double end_x = Current_enemy.x+16; // plus something
+                    double end_y = Current_enemy.y+16; //plus something
+                    if (Current_tower.fireballs.allFireballs.size()==0) {
+                        Current_tower.add_FIRE(this, fireball, end_x, end_y);
+                    }
                     towers.allTowers.set(tower, Current_tower);
                 }
             }
@@ -247,17 +249,25 @@ public class App extends PApplet {
             for (int tow = 0; tow<towers.allTowers.size(); tow++) {
                 tower = towers.allTowers.get(tow);
                 if (tower.damage_lvl>=2&&tower.speed_lvl>=2&&tower.range_lvl>=2) {
-                    tower.draw(this, tower_2);
+                    FB = tower.draw(this, tower_2);
                     tower.setLevel(2);
                 } else if (tower.damage_lvl>=1&&tower.speed_lvl>=1&&tower.range_lvl>=1) {
-                    tower.draw(this, tower_1);
+                    FB = tower.draw(this, tower_1);
                     tower.setLevel(1);
                 } else {
-                    tower.draw(this, tower_0);
+                    FB = tower.draw(this, tower_0);
                     tower.setLevel(0);
                 }
                 towerAdditions(tower, tow); 
+                if (FB!=null) {
+                    if (FB.destination_reached) {
+                        for (int M = 0; M<enemies.allBaddies.size(); M++) {
+                            // here is where we add damage to enemies.
+                        }
+                    }
+                }
             }
+
         }
     }
 

@@ -15,7 +15,7 @@ public class Fireball {
     public double end_x;
     public double end_y;
 
-
+    public boolean destination_reached;
     public int damage;
 
     public PImage sprite;
@@ -34,6 +34,8 @@ public class Fireball {
             this.x += this.x_vel;
             this.y += this.y_vel;
             app.image(sprite, this.x, this.y);
+        } else {
+            destination_reached = true;
         }
     }
 
