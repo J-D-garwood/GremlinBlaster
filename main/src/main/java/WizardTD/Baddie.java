@@ -16,8 +16,8 @@ public class Baddie {
     private Random rand = new Random();
     private int start = rand.nextInt(2);
 
-    private int xVel = 0;
-    private int yVel = 0;
+    public int xVel = 0;
+    public int yVel = 0;
 
     public boolean isAtWiz = false;
     private int velMult;
@@ -81,8 +81,8 @@ public class Baddie {
 
     public void draw(App app) {
         app.image(BaddieSprite, this.x, this.y);
-        this.x += xVel;
-        this.y += yVel;
+        this.x += xVel*Speed;
+        this.y += yVel*Speed;
         Integer[] current_corn;
         for (int i = 0; i<corners.size(); i++) {
             current_corn = corners.get(i);

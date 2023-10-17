@@ -133,11 +133,13 @@ public class App extends PApplet {
 	int villain_test_count = 0;
     Baddie villain;
     Tower tower;
+    Fireball FB;
 
     PImage tower_hold;
 
     Enemies enemies = new Enemies(this);
     Towers towers = new Towers(this);
+    Fireballs fireballs = new Fireballs(this);
     int index_of_last_selected_twr = 0;
 
     public PImage rotateWizTower(PImage orig, String direct) {
@@ -163,14 +165,27 @@ public class App extends PApplet {
             Tower Current_tower = towers.allTowers.get(tower);
             for (int enemy = 0; enemy<enemies.allBaddies.size();enemy++) {
                 Baddie Current_enemy = enemies.allBaddies.get(enemy);
-                double a = Math.abs((Current_enemy.x+16)-(Current_tower.x+16));
-                double b = Math.abs((Current_enemy.y+16)-(Current_tower.y+16));
+                double a = (Current_enemy.x+16)-(Current_tower.x+16);
+                double b = (Current_enemy.y+16)-(Current_tower.y+16);
                 double c = Math.sqrt(a*a+b*b);
                 if (c<Current_tower.range) {
-                    System.out.println("Something");
+                    double end_x = Current_enemy.x+16;
+                    double end_y = Current_enemy.y+16;
+                    Current_tower.add_FIRE(this, fireball, end_x, end_y);
+                    towers.allTowers.set(tower, Current_tower);
                 }
             }
+            /*if (Current_tower.fireballs.allFireballs.size()>0) {
+                for (int fb = 0; fb<Current_tower.fireballs.allFireballs.size(); fb++) {
+                Current_tower.fireballs.allFireballs.get(fb).draw(this);
+                }
+            }*/
         }
+        /*if (fireballs.allFireballs.size()>=1) {
+            for (int fire = 0; fire<fireballs.allFireballs.size(); fire++) {
+                fireballs.allFireballs.get(fire).draw(this);
+            }
+        }*/
     }
 
     public String repeater(String str, int times) {
@@ -638,7 +653,7 @@ public class App extends PApplet {
                         Current_mana -= tower_cost + 20;
                     }
                     //below image input needs to change
-                    tower = new Tower(this, min_x, min_y, base_tower_range, base_tower_damage, base_tower_speed);
+                    tower = new Tower(this, min_x, min_y, base_tower_range, base_tower_damage, base_tower_speed, FPS);
                     if (upgrade_damage) {
                         tower.upgrade_damage(base_tower_damage/2);
                     }
@@ -646,7 +661,7 @@ public class App extends PApplet {
                         tower.upgrade_range();
                     }
                     if (upgrade_speed) {
-                        tower.upgrade_speed();
+                        tower.upgrade_speed(FPS);
                     }
                     index_of_last_selected_twr = towers.allTowers.size();
                     towers.AddTower(tower);
