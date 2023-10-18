@@ -57,9 +57,9 @@ public class App extends PApplet {
 
     int wave_enemy_count = 0;
     boolean isWave1 = true;
-    boolean isWave2 = false;
-    boolean isWave3 = false;
-    boolean youWon = false;
+    boolean isWave2 = true;
+    boolean isWave3 = true;
+    boolean youWon = true;
     //config file extractions
     Integer base_tower_range;
     Float base_tower_speed;
@@ -180,10 +180,11 @@ public class App extends PApplet {
                     if (Current_tower.fireballs.allFireballs.size()==0) {
                         Current_tower.add_FIRE(this, fireball, end_x, end_y);
                         if (Current_tower.fireballs.allFireballs.size()==1) {
-                            System.out.println(Current_enemy.health);
                             Current_enemy.health -= Current_tower.damage*Current_enemy.Armor;
                             enemies.allBaddies.set(enemy, Current_enemy);
-                            System.out.println(Current_enemy.health);
+                            if (Current_enemy.health<=0&&Current_enemy.die_count<-2) {
+                                enemies.RemoveEnemy(enemy);
+                            }
                         } 
                     }
                     towers.allTowers.set(tower, Current_tower);
@@ -304,8 +305,8 @@ public class App extends PApplet {
                 Wave_num+=1;
                 wave_enemy_count = 0;
                 monster_frame_count = 0;
-                thisWave = false;
-                return true;
+                //thisWave = false;
+                return false;
             }
             // I have altered this so it is not exactly "correct" but it makes for nicer gameplay
             if ((monster_frame_count%((FPS*2)/furtherWaveData.getInt("duration")))==0.0/*&&(monster_frame_count%((FPS)/furtherWaveData.getInt("duration")))<=1*/) {
@@ -318,7 +319,8 @@ public class App extends PApplet {
                 }
             }
             for (int vil_c=enemies.allBaddies.size()-1; vil_c>-1; vil_c--) {
-                enemies.allBaddies.get(vil_c).draw(this);
+                int mana_gain = enemies.allBaddies.get(vil_c).draw(this);
+                Current_mana += mana_gain;
                 if (enemies.allBaddies.get(vil_c).isAtWiz) {
                     int HP = enemies.allBaddies.get(vil_c).health;
                     Current_mana -= HP;
@@ -329,7 +331,7 @@ public class App extends PApplet {
             //System.out.println(villain);
             //Wizard rendered last
         //Take section from
-        return false;
+        return true;
     }
 	// Feel free to add any additional methods or attributes you want. Please put classes in different files.
     public void printmap() {
@@ -692,6 +694,10 @@ public class App extends PApplet {
                     }
                     index_of_last_selected_twr = towers.allTowers.size();
                     towers.AddTower(tower);
+                    build_twr = false;
+                    upgrade_damage = false;
+                    upgrade_range = false;
+                    upgrade_speed = false;
                     break;              
                 };
             }
@@ -705,6 +711,9 @@ public class App extends PApplet {
                     for (int twr=0; twr<towers.allTowers.size();twr++) { 
                         if (towers.allTowers.get(twr).x==min_x&&towers.allTowers.get(twr).y==min_y) {
                             towers.allTowers.get(twr).selected = true;
+                            upgrade_damage = false;
+                            upgrade_range = false;
+                            upgrade_speed = false;
                         } else {
                              towers.allTowers.get(twr).selected = false;
                         }
@@ -805,11 +814,11 @@ public class App extends PApplet {
         this.text("M", 655,500);
 
         if (isWave1) {
-            isWave2 = movingStuff(isWave1, wave_1_monsters, wave_1_data, wave_2_data);
+            isWave1 = movingStuff(isWave1, wave_1_monsters, wave_1_data, wave_2_data);
         } else if (isWave2) {
-            isWave3 = movingStuff(isWave2, wave_2_monsters, wave_2_data, wave_3_data);
+            isWave2 = movingStuff(isWave2, wave_2_monsters, wave_2_data, wave_3_data);
         } else if (isWave3) {
-            youWon = movingStuff(isWave3, wave_3_monsters, wave_3_data, null);
+            isWave3 = movingStuff(isWave3, wave_3_monsters, wave_3_data, null);
         } else {
             youreAWinner();
         }

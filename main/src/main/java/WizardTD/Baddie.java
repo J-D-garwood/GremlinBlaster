@@ -90,16 +90,17 @@ public class Baddie {
     }
 
 
-    public void draw(App app) {
+    public int draw(App app) {
         if (this.health>0){
             app.image(BaddieSprite, this.x, this.y);
             if (this.health<this.max_health) {
-                /*Current_mana_f = (float) Current_mana;
-                man_w = (Current_mana / mana_max_f*270);
-                Mana_width = man_w.intValue();*/
+                float Current_health_f = (float) this.health;
+                Float h_w = (Current_health_f / (float)this.max_health)*20;
+                int health_width = h_w.intValue();
                 app.fill(255, 0, 0);
                 app.rect(this.x, this.y-8,20, 5);
                 app.fill(124, 252, 0);
+                app.rect(this.x, this.y-8,health_width, 5);
                 /*app.fill(255,0,0);
                 app.rect(this.x+(this.health/this.max_health)*20, this.y-8, 20-(this.health/this.max_health)*20, 5);*/
             }
@@ -127,16 +128,17 @@ public class Baddie {
                 this.isAtWiz = true;
             }
         } else {
-            this.DIE(app);
+            return this.DIE(app);
         }
+        return 0;
 
     }
 
-    public void ouch(int damage) {
+    /*public void ouch(int damage) {
         this.health -= damage;
-    }
+    }*/
     ///I have intensionally slowed down the death of the gremlin for artistic reasons (I think it looks better slowed down)
-    public void DIE(App app) {
+    public int DIE(App app) {
         if (this.die_count>6) {
             app.image(D1, this.x, this.y);
             this.die_count--;
@@ -155,8 +157,10 @@ public class Baddie {
         } else if (this.die_count==-2){
             this.x = -100;
             this.y = -100;
-            return;
+            this.die_count--;
+            return this.Mana_gain;
         }
+        return 0;
     }
 
 }
