@@ -125,6 +125,11 @@ public class App extends PApplet {
     PImage URD_path;
     PImage all_path;
     PImage gremlin;
+    PImage gremlin_death_part1;
+    PImage gremlin_death_part2;
+    PImage gremlin_death_part3;
+    PImage gremlin_death_part4;
+    PImage gremlin_death_part5;
     PImage tower_0;
     PImage tower_1;
     PImage tower_2;
@@ -134,6 +139,7 @@ public class App extends PApplet {
     Baddie villain;
     Tower tower;
     Fireball FB;
+    Baddie Current_enemy;
 
     PImage tower_hold;
 
@@ -164,7 +170,7 @@ public class App extends PApplet {
         for (int tower = 0; tower<towers.allTowers.size(); tower++) {
             Tower Current_tower = towers.allTowers.get(tower);
             for (int enemy = 0; enemy<enemies.allBaddies.size();enemy++) {
-                Baddie Current_enemy = enemies.allBaddies.get(enemy);
+                Current_enemy = enemies.allBaddies.get(enemy);
                 double a = (Current_enemy.x+16)-(Current_tower.x+16);
                 double b = (Current_enemy.y+16)-(Current_tower.y+16);
                 double c = Math.sqrt(a*a+b*b);
@@ -173,6 +179,12 @@ public class App extends PApplet {
                     double end_y = Current_enemy.y+16; //plus something
                     if (Current_tower.fireballs.allFireballs.size()==0) {
                         Current_tower.add_FIRE(this, fireball, end_x, end_y);
+                        if (Current_tower.fireballs.allFireballs.size()==1) {
+                            System.out.println(Current_enemy.health);
+                            Current_enemy.health -= Current_tower.damage*Current_enemy.Armor;
+                            enemies.allBaddies.set(enemy, Current_enemy);
+                            System.out.println(Current_enemy.health);
+                        } 
                     }
                     towers.allTowers.set(tower, Current_tower);
                 }
@@ -299,7 +311,7 @@ public class App extends PApplet {
             if ((monster_frame_count%((FPS*2)/furtherWaveData.getInt("duration")))==0.0/*&&(monster_frame_count%((FPS)/furtherWaveData.getInt("duration")))<=1*/) {
                 if (wizard_HQ!=null) {
                     if (wave_enemy_count<wave_monsters.getJSONObject(0).getInt("quantity")) {
-                        villain = new Baddie(this, gremlin, baddieEntrance, corners, wizard_HQ, wave_monsters.getJSONObject(0).getInt("hp"),wave_monsters.getJSONObject(0).getInt("speed"), wave_monsters.getJSONObject(0).getFloat("armour"), wave_monsters.getJSONObject(0).getInt("mana_gained_on_kill"));
+                        villain = new Baddie(this, gremlin, baddieEntrance, corners, wizard_HQ, wave_monsters.getJSONObject(0).getInt("hp"),wave_monsters.getJSONObject(0).getInt("speed"), wave_monsters.getJSONObject(0).getFloat("armour"), wave_monsters.getJSONObject(0).getInt("mana_gained_on_kill"), gremlin_death_part1, gremlin_death_part2, gremlin_death_part3, gremlin_death_part4, gremlin_death_part5);
                         enemies.AddEnemy(villain); 
                         wave_enemy_count+=1;
                     }    
@@ -554,6 +566,11 @@ public class App extends PApplet {
         URD_path = rotateImageByDegrees(LDR_path, 270);
         all_path = loadImage("src/main/resources/WizardTD/path3.png");
         gremlin = loadImage("src/main/resources/WizardTD/gremlin.png");
+        gremlin_death_part1 = loadImage("src/main/resources/WizardTD/gremlin1.png");
+        gremlin_death_part2 = loadImage("src/main/resources/WizardTD/gremlin2.png");
+        gremlin_death_part3 = loadImage("src/main/resources/WizardTD/gremlin3.png");
+        gremlin_death_part4 = loadImage("src/main/resources/WizardTD/gremlin4.png");
+        gremlin_death_part5 = loadImage("src/main/resources/WizardTD/gremlin5.png");
         tower_0 = loadImage("src/main/resources/WizardTD/tower0.png");
         tower_1 = loadImage("src/main/resources/WizardTD/tower1.png");
         tower_2 = loadImage("src/main/resources/WizardTD/tower2.png");
