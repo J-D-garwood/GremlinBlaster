@@ -144,6 +144,7 @@ public class App extends PApplet {
     PImage tower_hold;
 
     Enemies enemies = new Enemies(this);
+    boolean all_dead = true;
     Towers towers = new Towers(this);
     Fireballs fireballs = new Fireballs(this);
     int index_of_last_selected_twr = 0;
@@ -166,6 +167,15 @@ public class App extends PApplet {
 
     }
 
+    public boolean excessEnemyClearing() {
+        for (int x = 0; x<enemies.allBaddies.size();x++) {
+            if (!enemies.allBaddies.get(x).dead) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public void firingAtMonsters() {
         for (int tower = 0; tower<towers.allTowers.size(); tower++) {
             Tower Current_tower = towers.allTowers.get(tower);
@@ -182,9 +192,9 @@ public class App extends PApplet {
                         if (Current_tower.fireballs.allFireballs.size()==1) {
                             Current_enemy.health -= Current_tower.damage*Current_enemy.Armor;
                             enemies.allBaddies.set(enemy, Current_enemy);
-                            if (Current_enemy.health<=0&&Current_enemy.die_count<-2) {
+                            /*if (Current_enemy.health<=0&&Current_enemy.die_count<-2) {
                                 enemies.RemoveEnemy(enemy);
-                            }
+                            }*/
                         } 
                     }
                     towers.allTowers.set(tower, Current_tower);
@@ -298,13 +308,18 @@ public class App extends PApplet {
                 youreALoser();
                 //stop();
             }
-            if (wave_enemy_count==wave_monsters.getJSONObject(0).getInt("quantity")&&enemies.allBaddies.size()==0) {
-                if (!youWon) {
-                    Countdown = FPS*nextWaveData.getInt("pre_wave_pause");
+            if (wave_enemy_count==wave_monsters.getJSONObject(0).getInt("quantity")) {
+                all_dead = excessEnemyClearing();
+                if (all_dead) {
+                    enemies.allBaddies.clear();
                 }
+            }
+            if (wave_enemy_count==wave_monsters.getJSONObject(0).getInt("quantity")/**/&&enemies.allBaddies.size()==0) {
+                Countdown = FPS*nextWaveData.getInt("pre_wave_pause");
                 Wave_num+=1;
                 wave_enemy_count = 0;
                 monster_frame_count = 0;
+                all_dead = true;
                 //thisWave = false;
                 return false;
             }
@@ -693,6 +708,11 @@ public class App extends PApplet {
                         tower.upgrade_speed(FPS);
                     }
                     index_of_last_selected_twr = towers.allTowers.size();
+                    if (towers.allTowers.size()>0) {
+                        for (int t = 0; t<towers.allTowers.size();t++) {
+                            towers.allTowers.get(t).selected = false;
+                        }
+                    }
                     towers.AddTower(tower);
                     build_twr = false;
                     upgrade_damage = false;

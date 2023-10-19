@@ -21,6 +21,7 @@ public class Baddie {
     public int yVel = 0;
 
     public boolean isAtWiz = false;
+    public boolean dead = false;
     private int velMult;
 
     public int die_count = 8;
@@ -157,6 +158,7 @@ public class Baddie {
         } else if (this.die_count==-2){
             this.x = -100;
             this.y = -100;
+            this.dead = true;
             this.die_count--;
             return this.Mana_gain;
         }
