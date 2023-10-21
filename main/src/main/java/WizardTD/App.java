@@ -71,6 +71,7 @@ public class App extends PApplet {
     Integer mana_regen;
     Integer tower_cost;
     Integer mana_pool_base_cost;
+    Integer mana_pool_current_cost;
     Integer mana_pool_inc_cost;
     Float mana_pool_spell_mult;
     Float mana_pool_spell_gain_mult;
@@ -321,6 +322,20 @@ public class App extends PApplet {
                     towers.allTowers.get(t).selected = false;
                 }
             }*/
+            fill(240, 240, 240);
+            this.rect(650, 575, 100, 25);
+            this.rect(650, 600, 100, 25);
+            this.rect(650, 625, 100, 25);
+            this.rect(650, 650, 100, 25);
+            fill(0);
+            this.textSize(10);
+            this.text("Upgrade Cost", 655, 590);
+            int range_cost = 20 + (tower.range_lvl-1)*(10);
+            this.text("Range: " + range_cost, 655, 615);
+            int speed_cost = 20 + (tower.speed_lvl-1)*(10);
+            this.text("Speed: " + speed_cost, 655, 640);
+            int damage_cost = 20 + (tower.damage_lvl-1)*(10);
+            this.text("Damage: " + damage_cost, 655, 665);
             noFill();
             this.strokeWeight(3);
             this.stroke(255, 255, 0);
@@ -695,6 +710,7 @@ public class App extends PApplet {
         mana_regen = config.getInt("initial_mana_gained_per_second");
         tower_cost = config.getInt("tower_cost");
         mana_pool_base_cost = config.getInt("mana_pool_spell_initial_cost");
+        mana_pool_current_cost = mana_pool_base_cost;
         mana_pool_inc_cost = config.getInt("mana_pool_spell_cost_increase_per_use");
         mana_pool_spell_mult = config.getFloat("mana_pool_spell_cap_multiplier");
         mana_pool_spell_gain_mult = config.getFloat("mana_pool_spell_mana_gained_multiplier");
@@ -911,6 +927,22 @@ public class App extends PApplet {
             this.fill(0);
             this.text("0 / "+ mana_max, 550, 30);
         }
+        this.fill(0);
+        this.textSize(13);
+        this.text("2 x", 703, 115);
+        this.text("Speed", 703, 130);
+        this.text("pause", 703, 180);
+        this.text("build", 703, 240);
+        this.text("tower", 703, 255);
+        this.text("upgrade", 703, 300);
+        this.text("range", 703, 315);
+        this.text("upgrade", 703, 360);
+        this.text("speed", 703, 375);
+        this.text("upgrade", 703, 420);
+        this.text("damage", 703, 435);
+        this.text("Mana", 703, 480);
+        this.text("Pool", 703, 495);
+        this.text("Cost:"+mana_pool_current_cost, 703, 510);
         this.fill(165,135,16);
         this.rect(650, 105, 50, 50);
         this.rect(650, 165, 50, 50);
