@@ -1,5 +1,6 @@
 package WizardTD;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 import jogamp.graph.geom.plane.AffineTransform;
@@ -55,6 +56,9 @@ public class Tower {
                 }
             }
         }
+        if (this.fireballs.allFireballs.size()>2) {
+            this.fireballs.allFireballs = new ArrayList<Fireball>();
+        }
         return null;
     }
 
@@ -65,8 +69,11 @@ public class Tower {
             this.fireballs.AddFireball(FB);
         }
     }
-
+    // there is a range cap of 400
     public void upgrade_range() {
+        if (range>400) {
+            return;
+        }
         this.range += 32;
         this.range_lvl += 1;
     }
@@ -75,8 +82,11 @@ public class Tower {
         this.damage += damage_inc;
         this.damage_lvl += 1;
     }
-
+    // there is a speed cap of level 5
     public void upgrade_speed(int FPS) {
+        if (speed_lvl==5) {
+            return;
+        }
         this.speed += 0.5;
         this.speed_lvl += 1;
         this.fireball_time = FPS / speed;

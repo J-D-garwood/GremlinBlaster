@@ -156,8 +156,8 @@ public class Baddie {
             app.image(D5, this.x, this.y);
             this.die_count--;
         } else if (this.die_count==-2){
-            this.x = -100;
-            this.y = -100;
+            this.x = -1000;
+            this.y = -1000;
             this.dead = true;
             this.die_count--;
             return this.Mana_gain;

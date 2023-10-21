@@ -47,7 +47,7 @@ public class App extends PApplet {
     JSONObject wave_3_data;
     JSONArray wave_3_monsters;
 
-    float monster_frame_count;
+    float monster_frame_count = 0;
 
     List<Integer[]> baddieEntrance = new ArrayList<>();
     List<Integer[]> corners = new ArrayList<>();
@@ -60,6 +60,7 @@ public class App extends PApplet {
     boolean isWave2 = true;
     boolean isWave3 = true;
     boolean youWon = true;
+    boolean youLost = false;
     //config file extractions
     Integer base_tower_range;
     Float base_tower_speed;
@@ -148,6 +149,58 @@ public class App extends PApplet {
     Towers towers = new Towers(this);
     Fireballs fireballs = new Fireballs(this);
     int index_of_last_selected_twr = 0;
+    int button_y;
+
+    Integer[] button_ys = {105, 165, 225, 285, 345, 405, 465};//new Integer[7];
+
+    public void restart() {
+        Current_mana = mana_max;
+        monster_frame_count = 0;
+        wave_enemy_count = 0;
+        isWave1 = true;
+        isWave2 = true;
+        isWave3 = true;
+        youWon = true;
+        Wave_num = 1;
+        Countdown = FPS/2;
+
+        twotimes = false;
+        pause = false;
+        build_twr = false;
+        upgrade_range = false;
+        upgrade_speed = false;
+        upgrade_damage = false;
+        manapool = false;
+
+        enemies = new Enemies(this);
+        all_dead = true;
+        towers = new Towers(this);
+        fireballs = new Fireballs(this);
+        index_of_last_selected_twr = 0;
+
+    }
+
+    public void pause_check() {
+        if (pause) {
+            noLoop();
+            this.fill(255,255,0);
+            this.rect(650, 165, 50, 50);
+            this.fill(0);
+            this.text("P", 655,200);
+        } else {
+            loop();
+        }
+    }
+
+    public void update_buttons_hover() {
+        for (int b = 0; b<7; b++) {
+            button_y = button_ys[b];
+            if (mouseX>650&&mouseX<700&&mouseY>button_y&&mouseY<(button_y+50)) {
+                this.fill(128,128,128);
+                this.rect(650,button_y, 50, 50);
+            }
+        }
+    }
 
     public PImage rotateWizTower(PImage orig, String direct) {
         if (direct.equals("N")) {
@@ -161,9 +214,27 @@ public class App extends PApplet {
         }
     }
     public void youreALoser() {
+        for (int tower_un=0; tower_un<towers.allTowers.size(); tower_un++) {
+            towers.allTowers.get(tower_un).selected = false;
+        }
+        this.fill(255,0,0);        
+        this.textSize(100);
+        this.text("YOU LOST!", 100,300);
+        this.textSize(30);
+        this.text("Press 'r' to restart..", 150,370);
+
 
     }
     public void youreAWinner() {
+        for (int tower_un=0; tower_un<towers.allTowers.size(); tower_un++) {
+            towers.allTowers.get(tower_un).selected = false;
+        }
+        this.fill(255,255,0);        
+        this.textSize(100);
+        this.text("YOU WON!", 100,300);
+        this.textSize(30);
+        this.text("Press 'r' to restart..", 150,370);
+
 
     }
 
@@ -297,6 +368,10 @@ public class App extends PApplet {
 
     public boolean movingStuff(boolean thisWave, JSONArray wave_monsters, JSONObject furtherWaveData, JSONObject nextWaveData) {
         monster_frame_count+=1;
+        if (Current_mana<=0) {
+                youLost = true;
+                youreALoser();
+        }
         if (Countdown>0) {
             //countdown conditionally rendered before wave starts
             this.fill(0);
@@ -304,10 +379,6 @@ public class App extends PApplet {
             this.text("starts: "+Countdown/FPS,140, 35);
             Countdown -=1;
         } else {
-            if (Current_mana==0) {
-                youreALoser();
-                //stop();
-            }
             if (wave_enemy_count==wave_monsters.getJSONObject(0).getInt("quantity")) {
                 all_dead = excessEnemyClearing();
                 if (all_dead) {
@@ -315,12 +386,13 @@ public class App extends PApplet {
                 }
             }
             if (wave_enemy_count==wave_monsters.getJSONObject(0).getInt("quantity")/**/&&enemies.allBaddies.size()==0) {
-                Countdown = FPS*nextWaveData.getInt("pre_wave_pause");
-                Wave_num+=1;
-                wave_enemy_count = 0;
-                monster_frame_count = 0;
-                all_dead = true;
-                //thisWave = false;
+                if (nextWaveData!=null) {
+                    Countdown = FPS*nextWaveData.getInt("pre_wave_pause");
+                    Wave_num+=1;
+                    wave_enemy_count = 0;
+                    monster_frame_count = 0;
+                    all_dead = true;
+                }
                 return false;
             }
             // I have altered this so it is not exactly "correct" but it makes for nicer gameplay
@@ -335,7 +407,11 @@ public class App extends PApplet {
             }
             for (int vil_c=enemies.allBaddies.size()-1; vil_c>-1; vil_c--) {
                 int mana_gain = enemies.allBaddies.get(vil_c).draw(this);
-                Current_mana += mana_gain;
+                if (mana_gain<(mana_max-Current_mana)) {
+                    Current_mana += mana_gain;
+                } else {
+                    Current_mana += (mana_max-Current_mana);
+                }
                 if (enemies.allBaddies.get(vil_c).isAtWiz) {
                     int HP = enemies.allBaddies.get(vil_c).health;
                     Current_mana -= HP;
@@ -635,15 +711,7 @@ public class App extends PApplet {
         }
         if (key == 80) {
             pause = !pause;
-            if (pause) {
-                noLoop();
-                this.fill(255,255,0);
-                this.rect(650, 165, 50, 50);
-                this.fill(0);
-                this.text("P", 655,200);
-            } else {
-                loop();
-            }
+            pause_check();
         }
         if (key == 84) {
             build_twr = !build_twr;
@@ -660,6 +728,9 @@ public class App extends PApplet {
         if (key == 77) {
             manapool = !manapool;
         }
+        if (key == 82 && (!isWave1 && !isWave2 && !isWave3)||(youLost)) {
+            restart();
+        }
     }
 
     /**
@@ -672,6 +743,37 @@ public class App extends PApplet {
 
     @Override
     public void mousePressed(MouseEvent e) {
+        for (int b = 0; b<7; b++) {
+            button_y = button_ys[b];
+            if (mouseX>650&&mouseX<700&&mouseY>button_y&&mouseY<(button_y+50)) {
+                switch (b) {
+                    case 0:
+                        twotimes = !twotimes;
+                        break;
+                    case 1:
+                        pause = !pause;
+                        pause_check();
+                        break;
+                        
+                    case 2:
+                        build_twr = !build_twr;
+                        break;
+                    case 3:
+                        upgrade_range = !upgrade_range;
+                        break;
+                    case 4:
+                        upgrade_speed = !upgrade_speed;
+                        break;
+                    case 5:
+                        upgrade_damage = !upgrade_damage;
+                        break;
+                    case 6:
+                        manapool = !manapool;
+                        break;
+
+                }
+            }
+        }
         if (build_twr==true) {
             for (int tile=0; tile<grass_tiles.size();tile++) {
                 min_x = grass_tiles.get(tile)[0];
@@ -685,16 +787,32 @@ public class App extends PApplet {
                     towerHere[1] = min_y;
                     tower_tiles.add(towerHere);
                     if (!upgrade_damage&&!upgrade_range&&!upgrade_speed) {
-                        Current_mana -= tower_cost;
+                        if ((Current_mana - tower_cost)>0) {
+                            Current_mana -= tower_cost;
+                        } else {
+                            return;
+                        }
                     }
                     if (upgrade_damage&&upgrade_range&&upgrade_speed) {
-                        Current_mana -= tower_cost + 60;
+                        if ((Current_mana - (tower_cost+60))>0) {
+                            Current_mana -= tower_cost + 60;
+                        } else {
+                            return;
+                        }
                     }
                     if ((upgrade_damage&&upgrade_range&&!upgrade_speed)||(upgrade_damage&&!upgrade_range&&upgrade_speed)||(!upgrade_damage&&upgrade_range&&upgrade_speed)) {
-                        Current_mana -= tower_cost + 40;
+                        if ((Current_mana - (tower_cost+40))>0) {
+                            Current_mana -= tower_cost + 40;
+                        } else {
+                            return;
+                        }
                     }
                     if ((!upgrade_damage&&upgrade_range&&!upgrade_speed)||(upgrade_damage&&!upgrade_range&&!upgrade_speed)||(!upgrade_damage&&!upgrade_range&&upgrade_speed)) {
-                        Current_mana -= tower_cost + 20;
+                        if ((Current_mana - (tower_cost+20))>0) {
+                            Current_mana -= tower_cost + 20;
+                        } else {
+                            return;
+                        }
                     }
                     //below image input needs to change
                     tower = new Tower(this, min_x, min_y, base_tower_range, base_tower_damage, base_tower_speed, FPS);
@@ -823,6 +941,7 @@ public class App extends PApplet {
         if (manapool) {
             this.rect(650, 465, 50, 50);
         }
+        update_buttons_hover();
         this.fill(0);
         this.textSize(30);
         this.text("FF", 655,140);
@@ -832,6 +951,32 @@ public class App extends PApplet {
         this.text("U2", 655,380);
         this.text("U3", 655,440);
         this.text("M", 655,500);
+
+        for (int t = 0; t<towers.allTowers.size(); t++) {
+            if (towers.allTowers.get(t).selected) {
+                if (upgrade_damage) {
+                    if (Current_mana - (20 + (towers.allTowers.get(t).damage_lvl-1)*10)>0) {
+                        Current_mana -= (20 + (towers.allTowers.get(t).damage_lvl-1)*10);
+                        towers.allTowers.get(t).upgrade_damage(base_tower_damage/2);
+                        upgrade_damage = false;
+                    }
+                }
+                if (upgrade_range) {
+                    if (Current_mana - (20 + (towers.allTowers.get(t).range_lvl-1)*10)>0) {
+                        Current_mana -= (20 + (towers.allTowers.get(t).range_lvl-1)*10);
+                        towers.allTowers.get(t).upgrade_range();
+                        upgrade_range = false;
+                    }
+                }
+                if (upgrade_speed) {
+                    if (Current_mana - (20 + (towers.allTowers.get(t).speed_lvl-1)*10)>0) {
+                        Current_mana -= (20 + (towers.allTowers.get(t).speed_lvl-1)*10);
+                        towers.allTowers.get(t).upgrade_speed(FPS);;
+                        upgrade_speed = false;
+                    }
+                }
+            }
+        }
 
         if (isWave1) {
             isWave1 = movingStuff(isWave1, wave_1_monsters, wave_1_data, wave_2_data);
