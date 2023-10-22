@@ -1,3 +1,4 @@
+//importing packages
 package WizardTD;
 
 import java.util.ArrayList;
@@ -6,32 +7,37 @@ import java.util.Random;
 import jogamp.graph.geom.plane.AffineTransform;
 import processing.core.PImage;
 
+//class Tower represents towers
 public class Tower {
     
+    // x and y integers represent tower location
     public int x;
     public int y;
 
+    // key tower attributes
     public  int range;
     public int damage;
     public float speed;
 
+    // primitives for calibrating fireball generation
     public float fireball_time;
     public int frame_count;
 
+    //tower attribute levels and overall level (up to 2, beyond irrelevant)
     public int lvl = 0;
     public int range_lvl = 0;
     public int damage_lvl = 0;
     public int speed_lvl = 0;
 
+    //boolean which indicates whether tower is selected
     public boolean selected = true;
 
+    //Fireballs class holds all this towers currently active fireballs
     public Fireballs fireballs;
+    //Fireball class
     public Fireball FB;
-    /*private int width = 20;
-    private int height = 20;*/
 
-    //private boolean firingNow;
-
+    //Tower constructor, writes in key attributes
     public Tower(App app, int x, int y, int range, int damage, float speed, int FPS) {
         this.x = x;
         this.y = y;
@@ -42,7 +48,7 @@ public class Tower {
         this.fireball_time = FPS / speed;
     }
 
-    // may need to change "void" to "int" in below method...
+    // drawing tower and its fireballs 
     public Fireball draw(App app,  PImage towerSprite) {
         app.image(towerSprite, x, y);
         this.frame_count += 1;
@@ -62,14 +68,15 @@ public class Tower {
         return null;
     }
 
-
+//adding a new fireball to towers active fireballs, if and only if, enough frames have been rendered sinced the last.
     public void add_FIRE(App app, PImage sprite, double end_x, double end_y) {
         if (frame_count%fireball_time==0) {
             FB = new Fireball(app, sprite, this.x+16, this.y+16, end_x, end_y);
             this.fireballs.AddFireball(FB);
         }
     }
-    // there is a range cap of 400
+
+    // upgrading tower range , there is a range cap of 400 pixels
     public void upgrade_range() {
         if (range>400) {
             return;
@@ -78,13 +85,14 @@ public class Tower {
         this.range_lvl += 1;
     }
 
+    //upgrading tower damage
     public void upgrade_damage(int damage_inc) {
         this.damage += damage_inc;
         this.damage_lvl += 1;
     }
-    // there is a speed cap of level 5
+    // upgrading tower speed, there is a speed cap of level 3 (errors and lag develops if allowed to go faster)
     public void upgrade_speed(int FPS) {
-        if (speed_lvl==5) {
+        if (speed_lvl==3) {
             return;
         }
         this.speed += 0.5;
@@ -92,9 +100,7 @@ public class Tower {
         this.fireball_time = FPS / speed;
     }
 
-    public void spawn(App app, int x, int y) {
-    }
-
+    //method to set overall level of tower
     public void setLevel(int lvl) {
         this.lvl = lvl;
     }

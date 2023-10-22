@@ -1,3 +1,4 @@
+//importing packages
 package WizardTD;
 
 import java.util.List;
@@ -5,10 +6,13 @@ import java.util.Random;
 
 import processing.core.PImage;
 
+// class baddie represents gremlins
 public class Baddie {
+    // x and y integers represent gremlin location
     public int x;
     public int y;
 
+    // baddie key attributes, current health, max health, speed, etc.
     public int health;
     public int max_health;
     public int Speed;
@@ -17,29 +21,35 @@ public class Baddie {
     private Random rand = new Random();
     private int start = rand.nextInt(2);
 
+    //integers that represent baddie x, y movement vectors
     public int xVel = 0;
     public int yVel = 0;
 
+
+    // boolean values, is baddie "dead", has baddie reached the wizard house
     public boolean isAtWiz = false;
     public boolean dead = false;
-    private int velMult;
 
+    //counter for baddie's death frames
     public int die_count = 8;
 
+    //integer array of wizard HQ
     private Integer[] wizard_HQ;
 
+    //Rendered Gremlin image container
     private PImage BaddieSprite;
 
+    //Gremlin death frames
     private PImage D1;
     private PImage D2;
     private PImage D3;
     private PImage D4;
     private PImage D5;
 
-
+    //list of map corners
     private List<Integer[]> corners;
 
-
+    //class constructor, writes in above attributes, determines starting location and movement
     public Baddie(App app, PImage BaddieSprite, List<Integer[]> baddieEntrance, List<Integer[]> corners, Integer[] wizard_HQ, Integer HP, Integer Speed, Float Armor, Integer Mana_gain, PImage D1, PImage D2, PImage D3, PImage D4, PImage D5) {
         Integer[] beginning_coords = baddieEntrance.get(start);
         this.wizard_HQ = wizard_HQ;
@@ -64,16 +74,19 @@ public class Baddie {
         this.corners = corners;
     }
 
+    // method to set gremlin motion south
     public void down() {
         this.xVel = 0;
         this.yVel = 1;
     }
 
+    // method to set gremlin motion north
     public void up() {
         this.xVel = 0;
         this.yVel = -1;
     }
 
+    // method to set gremlin motion east
     public void right() {
         if (this.xVel==-1) {
             return;
@@ -82,6 +95,7 @@ public class Baddie {
         this.yVel = 0;
     }
 
+    //method to set gremlin motion west
     public void left() {
         if (this.xVel==1) {
             return;
@@ -90,7 +104,7 @@ public class Baddie {
         this.yVel = 0;
     }
 
-
+    //method to draw the baddie at its current coords (and healthbar if health lower than max)
     public int draw(App app) {
         if (this.health>0){
             app.image(BaddieSprite, this.x, this.y);
@@ -102,11 +116,11 @@ public class Baddie {
                 app.rect(this.x, this.y-8,20, 5);
                 app.fill(124, 252, 0);
                 app.rect(this.x, this.y-8,health_width, 5);
-                /*app.fill(255,0,0);
-                app.rect(this.x+(this.health/this.max_health)*20, this.y-8, 20-(this.health/this.max_health)*20, 5);*/
             }
+            //gremlin moving based on movement vectors (multiplied by speed scalar)
             this.x += xVel*Speed;
             this.y += yVel*Speed;
+            //this next section checks if the gremlin has reached a corner, and adjusts its motion accordingly
             Integer[] current_corn;
             for (int i = 0; i<corners.size(); i++) {
             current_corn = corners.get(i);
@@ -129,16 +143,14 @@ public class Baddie {
                 this.isAtWiz = true;
             }
         } else {
+            // baddie dies if health is equal to or lower than 0
             return this.DIE(app);
         }
         return 0;
 
     }
 
-    /*public void ouch(int damage) {
-        this.health -= damage;
-    }*/
-    ///I have intensionally slowed down the death of the gremlin for artistic reasons (I think it looks better slowed down)
+    //death of gremlin, happens in total of 10 frames because I think it looks better than 4 frames.
     public int DIE(App app) {
         if (this.die_count>6) {
             app.image(D1, this.x, this.y);
